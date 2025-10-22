@@ -1,0 +1,23 @@
+{
+  "last-device": "ch347",
+  "device-configs": {
+    "ch341": {
+      "max-speed-hz": 0
+    },
+    "ft232h": {
+      "max-speed-hz": 30000000
+    },
+    "ch347": {
+      "max-speed-hz": 15000000
+    },
+    "ch341-libusb": {
+      "max-speed-hz": 0
+    },
+    "ft232h-libusb": {
+      "max-speed-hz": 30000000
+    },
+    "ch347-libusb": {
+      "max-speed-hz": 15000000
+    }
+  }
+}
