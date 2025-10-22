@@ -16,12 +16,6 @@ jobs:
       run:
         shell: msys2 {0}
 
-    env:
-      OUT_DIR: ${{ steps.names.outputs.artifact_folder }}
-      ZIP_NAME: ${{ steps.names.outputs.zip_name }}
-      TAG_NAME: ${{ steps.names.outputs.tag_name }}
-      RELEASE_TITLE: ${{ steps.names.outputs.release_title }}
-
     steps:
     - name: 1. Install MSYS2, MinGW toolchain, and dependencies
       uses: msys2/setup-msys2@v2
@@ -61,6 +55,8 @@ jobs:
         echo "zip_name=ufprog-win64-mingw-msvcrt-$latest_date.zip"    >> "$GITHUB_OUTPUT"
 
     - name: 4. Configure, Build, and Install
+      env:
+        OUT_DIR: ${{ steps.names.outputs.artifact_folder }}
       run: |
         set -e
         echo "::group::Configuring CMake"
@@ -69,7 +65,7 @@ jobs:
           -DCMAKE_BUILD_TYPE=Release \
           -DBUILD_PORTABLE=ON \
           -DCMAKE_INSTALL_PREFIX="${OUT_DIR}" \
-          #-DCMAKE_POLICY_VERSION_MINIMUM=3.5 \
+          -DCMAKE_POLICY_VERSION_MINIMUM=3.5 \
           -DCMAKE_C_FLAGS_RELEASE="-O2 -DNDEBUG -s -fvisibility=hidden" \
           -DCMAKE_CXX_FLAGS_RELEASE="-O2 -DNDEBUG -s -fvisibility=hidden"
         echo "::endgroup::"
@@ -81,7 +77,8 @@ jobs:
         echo "::endgroup::"
 
     - name: 5. Organize and Package Artifacts
-      if: true
+      env:
+        OUT_DIR: ${{ steps.names.outputs.artifact_folder }}
       run: |
         set -e
         echo "Organizing artifacts into: $OUT_DIR"
@@ -157,27 +154,28 @@ jobs:
     - name: 6. Compress Artifacts with 7-Zip
       run: |
         "/c/Program Files/7-Zip/7z.exe" a -tzip -mx=9 \
-          "${ZIP_NAME}" \
-          "${OUT_DIR}/*"
+          "${{ steps.names.outputs.zip_name }}" \
+          "${{ steps.names.outputs.artifact_folder }}/*"
 
     - name: 7. Delete Existing Release and Tag (if any)
+      env:
+        GH_TOKEN: ${{ github.token }}
+        GITHUB_REPOSITORY: ${{ github.repository }}
+        TAG_NAME: ${{ steps.names.outputs.tag_name }}
       run: |
         gh_cli="/c/Program Files/GitHub CLI/gh.exe"
         echo "Checking for existing release and tag: $TAG_NAME"
         "$gh_cli" release delete "$TAG_NAME" --yes --cleanup-tag --repo "$GITHUB_REPOSITORY" || echo "No existing release/tag found or insufficient permission"
-      env:
-        GH_TOKEN: ${{ github.token }}
-        GITHUB_REPOSITORY: ${{ github.repository }}
 
     - name: 8. Create GitHub Release and Upload Asset
       if: true
       uses: softprops/action-gh-release@v2
       with:
-        tag_name: ${{ env.TAG_NAME }}
-        name: ${{ env.RELEASE_TITLE }}
+        tag_name: ${{ steps.names.outputs.tag_name }}
+        name: ${{ steps.names.outputs.release_title }}
         body: |
           Automatic build from the latest commit in [hackpascal/ufprog](https://github.com/hackpascal/ufprog).
 
           This release contains the MinGW (UCRT) build artifacts for Windows (64-bit).
-        files: ${{ env.ZIP_NAME }}
+        files: ${{ steps.names.outputs.zip_name }}
         make_latest: true
