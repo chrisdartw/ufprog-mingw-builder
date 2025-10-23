@@ -155,9 +155,7 @@ jobs:
 
     - name: 6. Compress Artifacts with 7-Zip
       run: |
-        "/c/Program Files/7-Zip/7z.exe" a -tzip -mx=9 \
-          "${{ steps.names.outputs.zip_name }}" \
-          "${{ steps.names.outputs.artifact_folder }}/*"
+        7z a -tzip -mx=9 "${{ steps.names.outputs.zip_name }}" "${{ steps.names.outputs.artifact_folder }}/*"
 
     - name: 7. Delete Existing Release and Tag (if any)
       env:
@@ -165,9 +163,8 @@ jobs:
         GITHUB_REPOSITORY: ${{ github.repository }}
         TAG_NAME: ${{ steps.names.outputs.tag_name }}
       run: |
-        gh_cli="/c/Program Files/GitHub CLI/gh.exe"
         echo "Checking for existing release and tag: $TAG_NAME"
-        "$gh_cli" release delete "$TAG_NAME" --yes --cleanup-tag --repo "$GITHUB_REPOSITORY" || echo "No existing release/tag found or insufficient permission"
+        gh release delete "$TAG_NAME" --yes --cleanup-tag --repo "$GITHUB_REPOSITORY" || echo "No existing release/tag found or insufficient permission"
 
     - name: 8. Create GitHub Release and Upload Asset
       if: true
