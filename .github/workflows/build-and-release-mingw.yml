@@ -30,7 +30,6 @@ jobs:
           json-c:p
           libusb:p
           hidapi:p
-          #git
           7zip
           github-cli
 
