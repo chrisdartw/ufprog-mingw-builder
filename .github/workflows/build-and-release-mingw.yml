@@ -31,8 +31,8 @@ jobs:
           libusb:p
           hidapi:p
           git
-          7zip:p
-          github-cli:p
+          7zip
+          github-cli
 
     - name: 2. Checkout ufprog source code
       uses: actions/checkout@v5
