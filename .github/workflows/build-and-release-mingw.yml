@@ -30,6 +30,9 @@ jobs:
           json-c:p
           libusb:p
           hidapi:p
+          git:p
+          7zip:p
+          github-cli:p
 
     - name: 2. Checkout ufprog source code
       uses: actions/checkout@v5
