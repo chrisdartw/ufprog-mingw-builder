@@ -22,15 +22,15 @@ jobs:
       with:
         msystem: UCRT64
         update: true
-        install: >-
-          git
+        #install: >-
+        #  git
         pacboy: >-
           toolchain:p
           cmake:p
           json-c:p
           libusb:p
           hidapi:p
-          git:p
+          git
           7zip:p
           github-cli:p
 
