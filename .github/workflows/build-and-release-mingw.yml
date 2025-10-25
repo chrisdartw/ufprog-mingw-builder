@@ -9,15 +9,13 @@ jobs:
   build-and-release:
     permissions:
       contents: write
-
     runs-on: windows-2022
-
     defaults:
       run:
         shell: msys2 {0}
 
     steps:
-    - name: 1. Install MSYS2, MinGW toolchain, and dependencies
+    - name: 0. Install MSYS2, MinGW toolchain, and dependencies
       uses: msys2/setup-msys2@v2
       with:
         msystem: UCRT64
@@ -33,14 +31,14 @@ jobs:
           7zip
           github-cli
 
-    - name: 2. Checkout ufprog source code
+    - name: 1. Checkout ufprog source code
       uses: actions/checkout@v5
       with:
         repository: hackpascal/ufprog
         fetch-depth: 0
         submodules: recursive
 
-    - name: 2.1. Checkout my repository
+    - name: 2. Checkout my repository
       uses: actions/checkout@v5
       with:
         path: my-repo
@@ -71,11 +69,8 @@ jobs:
           -DCMAKE_C_FLAGS_RELEASE="-O2 -DNDEBUG -s -fvisibility=hidden" \
           -DCMAKE_CXX_FLAGS_RELEASE="-O2 -DNDEBUG -s -fvisibility=hidden"
         echo "::endgroup::"
-        echo "::group::Building with CMake"
-        cmake --build build -j $(nproc || echo 4)
-        echo "::endgroup::"
-        echo "::group::Installing with CMake"
-        cmake --install build --prefix "$OUT_DIR"
+        echo "::group::Building and Installing with CMake"
+        cmake --build build --target install -- -j $(nproc || echo 4)
         echo "::endgroup::"
 
     - name: 5. Organize and Package Artifacts
