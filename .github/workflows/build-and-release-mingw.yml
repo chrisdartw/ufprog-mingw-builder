@@ -1,4 +1,6 @@
 name: Build and Release ufprog (MinGW)
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
 on:
   push:
@@ -163,7 +165,7 @@ jobs:
 
     - name: 8. Create GitHub Release and Upload Asset
       if: true
-      uses: softprops/action-gh-release@v2
+      uses: softprops/action-gh-release@v3
       with:
         tag_name: ${{ steps.names.outputs.tag_name }}
         name: ${{ steps.names.outputs.release_title }}
